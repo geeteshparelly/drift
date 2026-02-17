@@ -14,8 +14,11 @@
       --color-text: #2c2520;
       --color-text-muted: #6b5f54;
       --color-accent: #c4653a;
-      --color-accent-soft: rgba(196, 101, 58, 0.12);
+      --color-accent-soft: rgba(196, 101, 58, 0.15);
       --color-border: #d9d0c4;
+      --color-warm-gold: #e8b86d;
+      --color-soft-rose: #d4a5a5;
+      --color-sage: #a8c5a8;
       --font-display: 'Fraunces', Georgia, serif;
       --font-body: 'DM Sans', system-ui, sans-serif;
     }
@@ -37,17 +40,38 @@
       line-height: 1.7;
       font-size: clamp(1rem, 2.5vw, 1.125rem);
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* Grain overlay */
+    /* Grain overlay - more visible */
     body::after {
       content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 9999;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Gradient mesh background */
+    .gradient-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background: 
+        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(232, 184, 109, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 30%, rgba(212, 165, 165, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 50% at 10% 80%, rgba(168, 197, 168, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 60% at 90% 90%, rgba(196, 101, 58, 0.08) 0%, transparent 50%),
+        var(--color-bg);
+    }
+
+    /* Floating SVG decorations */
+    .svg-decoration {
+      position: absolute;
+      pointer-events: none;
+      z-index: -1;
     }
 
     /* Opening */
@@ -60,6 +84,50 @@
       text-align: center;
       padding: 2rem;
       position: relative;
+      overflow: hidden;
+    }
+
+    .opening-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 30% 40%, rgba(232, 184, 109, 0.25) 0%, transparent 40%),
+        radial-gradient(circle at 70% 60%, rgba(196, 101, 58, 0.15) 0%, transparent 35%);
+      z-index: -1;
+    }
+
+    .opening-svg-1 {
+      top: 10%;
+      left: 5%;
+      width: 300px;
+      height: 300px;
+      opacity: 0.4;
+      animation: floatSlow 20s ease-in-out infinite;
+    }
+
+    .opening-svg-2 {
+      bottom: 15%;
+      right: 8%;
+      width: 250px;
+      height: 250px;
+      opacity: 0.3;
+      animation: floatSlow 25s ease-in-out infinite reverse;
+    }
+
+    .opening-svg-3 {
+      top: 60%;
+      left: 15%;
+      width: 150px;
+      height: 150px;
+      opacity: 0.25;
+      animation: floatSlow 18s ease-in-out infinite 5s;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(10px, -15px) rotate(2deg); }
+      50% { transform: translate(-5px, 10px) rotate(-1deg); }
+      75% { transform: translate(15px, 5px) rotate(1deg); }
     }
 
     .opening-prompt {
@@ -83,6 +151,19 @@
       max-width: 14ch;
       opacity: 0;
       animation: fadeUp 1.2s ease 0.8s forwards;
+      position: relative;
+    }
+
+    .opening-question::before {
+      content: '';
+      position: absolute;
+      width: 120%;
+      height: 120%;
+      top: -10%;
+      left: -10%;
+      background: radial-gradient(ellipse, rgba(232, 184, 109, 0.2) 0%, transparent 70%);
+      z-index: -1;
+      filter: blur(40px);
     }
 
     .opening-scroll {
@@ -100,7 +181,7 @@
       display: block;
       width: 1px;
       height: 40px;
-      background: var(--color-border);
+      background: linear-gradient(to bottom, var(--color-border), transparent);
       margin: 1rem auto 0;
     }
 
@@ -119,9 +200,52 @@
       50% { transform: translateY(8px); }
     }
 
+    /* Section dividers with gradients */
+    .section-divider {
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .divider-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, 
+        rgba(232, 184, 109, 0.1) 0%, 
+        rgba(212, 165, 165, 0.08) 50%, 
+        rgba(168, 197, 168, 0.1) 100%);
+    }
+
+    .divider-line {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--color-border) 20%, 
+        var(--color-accent) 50%, 
+        var(--color-border) 80%, 
+        transparent 100%);
+    }
+
+    .divider-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(196, 101, 58, 0.5);
+    }
+
     /* Manifesto sections */
     .manifesto {
       padding: 0 clamp(1.5rem, 8vw, 12rem);
+      position: relative;
     }
 
     .chapter {
@@ -130,6 +254,42 @@
       flex-direction: column;
       justify-content: center;
       padding: 6rem 0;
+      position: relative;
+    }
+
+    .chapter-glow {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .chapter:nth-child(1) .chapter-glow {
+      background: var(--color-warm-gold);
+      top: 20%;
+      right: -10%;
+    }
+
+    .chapter:nth-child(2) .chapter-glow {
+      background: var(--color-soft-rose);
+      top: 30%;
+      left: -15%;
+    }
+
+    .chapter:nth-child(3) .chapter-glow {
+      background: var(--color-sage);
+      bottom: 20%;
+      right: -5%;
+    }
+
+    .chapter:nth-child(4) .chapter-glow {
+      background: var(--color-accent);
+      top: 40%;
+      left: 20%;
+      opacity: 0.1;
     }
 
     .chapter-text {
@@ -138,6 +298,7 @@
       font-weight: 300;
       line-height: 1.5;
       max-width: 20ch;
+      position: relative;
     }
 
     .chapter-text.right {
@@ -154,6 +315,18 @@
     .chapter-text em {
       font-style: italic;
       color: var(--color-accent);
+      position: relative;
+    }
+
+    .chapter-text em::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--color-accent), transparent);
+      opacity: 0.5;
     }
 
     .chapter-note {
@@ -163,6 +336,19 @@
       padding-left: 1.5rem;
       border-left: 2px solid var(--color-border);
       max-width: 35ch;
+      position: relative;
+    }
+
+    .chapter-note::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 0;
+      width: 10px;
+      height: 10px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      opacity: 0.6;
     }
 
     .chapter-note.right {
@@ -173,11 +359,26 @@
       border-right: 2px solid var(--color-border);
     }
 
+    .chapter-note.right::before {
+      left: auto;
+      right: -6px;
+    }
+
     /* Marquee */
     .marquee-section {
-      padding: 4rem 0;
-      background: var(--color-bg-alt);
-      margin: 4rem 0;
+      padding: 5rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .marquee-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 50%, var(--color-bg) 100%),
+        radial-gradient(ellipse at 30% 50%, rgba(232, 184, 109, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 50%, rgba(196, 101, 58, 0.1) 0%, transparent 50%);
+      z-index: -1;
     }
 
     .marquee {
@@ -186,6 +387,8 @@
       border-top: 1px solid var(--color-border);
       border-bottom: 1px solid var(--color-border);
       padding: 1.25rem 0;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
     }
 
     .marquee-inner {
@@ -209,16 +412,148 @@
       border-radius: 50%;
       margin: 0 2rem;
       vertical-align: middle;
+      box-shadow: 0 0 10px rgba(196, 101, 58, 0.5);
     }
 
     @keyframes marqueeScroll {
       to { transform: translateX(-50%); }
     }
 
+    /* Video placeholder section */
+    .video-section {
+      padding: 8rem clamp(1.5rem, 8vw, 12rem);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-section-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(196, 101, 58, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(168, 197, 168, 0.1) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    .video-intro {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      font-weight: 300;
+      max-width: 45ch;
+      margin-bottom: 4rem;
+      line-height: 1.6;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .video-placeholder {
+      aspect-ratio: 16/10;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, 
+        var(--color-bg-alt) 0%, 
+        rgba(255, 255, 255, 0.8) 50%, 
+        var(--color-bg-alt) 100%);
+      background-size: 300% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+      box-shadow: 
+        0 20px 60px rgba(44, 37, 32, 0.1),
+        0 0 0 1px var(--color-border),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    .video-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 30% 30%, rgba(232, 184, 109, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(196, 101, 58, 0.15) 0%, transparent 50%);
+    }
+
+    .video-placeholder::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .video-play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-45%, -50%);
+      width: 0;
+      height: 0;
+      border-left: 18px solid var(--color-accent);
+      border-top: 12px solid transparent;
+      border-bottom: 12px solid transparent;
+      z-index: 1;
+    }
+
+    .video-label {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      background: rgba(255, 255, 255, 0.8);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      backdrop-filter: blur(10px);
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
     /* Journal UI mockup */
     .journal-section {
       padding: 8rem clamp(1.5rem, 8vw, 12rem);
       position: relative;
+      overflow: hidden;
+    }
+
+    .journal-section-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 100% 80% at 80% 20%, rgba(212, 165, 165, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 60% at 10% 80%, rgba(168, 197, 168, 0.1) 0%, transparent 50%),
+        linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 100%);
+      z-index: -1;
+    }
+
+    .journal-svg-1 {
+      top: 5%;
+      right: 5%;
+      width: 200px;
+      height: 200px;
+      opacity: 0.2;
+    }
+
+    .journal-svg-2 {
+      bottom: 10%;
+      left: 3%;
+      width: 180px;
+      height: 180px;
+      opacity: 0.15;
     }
 
     .journal-intro {
@@ -231,13 +566,17 @@
     }
 
     .journal-mockup {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 40px 100px rgba(44, 37, 32, 0.12), 0 0 0 1px var(--color-border);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+      border-radius: 20px;
+      box-shadow: 
+        0 50px 100px rgba(44, 37, 32, 0.15), 
+        0 0 0 1px rgba(217, 208, 196, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
       padding: clamp(1.5rem, 4vw, 3rem);
       max-width: 700px;
       position: relative;
       overflow: hidden;
+      backdrop-filter: blur(20px);
     }
 
     .journal-mockup::before {
@@ -246,8 +585,19 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 50px;
-      background: linear-gradient(to bottom, var(--color-bg-alt), transparent);
+      height: 60px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), transparent);
+      pointer-events: none;
+    }
+
+    .journal-mockup::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(232, 184, 109, 0.15) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -264,6 +614,7 @@
       font-weight: 300;
       line-height: 1.9;
       color: var(--color-text);
+      position: relative;
     }
 
     .journal-entry p {
@@ -271,11 +622,23 @@
     }
 
     .ai-connection {
-      background: var(--color-accent-soft);
+      background: linear-gradient(135deg, var(--color-accent-soft), rgba(232, 184, 109, 0.1));
       border-left: 3px solid var(--color-accent);
-      padding: 1rem 1.25rem;
+      padding: 1.25rem 1.5rem;
       margin: 2rem 0;
-      border-radius: 0 8px 8px 0;
+      border-radius: 0 12px 12px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-connection::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(196, 101, 58, 0.1) 0%, transparent 70%);
     }
 
     .ai-connection-label {
@@ -285,6 +648,23 @@
       text-transform: uppercase;
       color: var(--color-accent);
       margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ai-connection-label::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
     }
 
     .ai-connection-text {
@@ -304,8 +684,18 @@
     .horizontal-wrapper {
       height: 100vh;
       overflow: hidden;
-      background: var(--color-text);
-      color: var(--color-bg);
+      position: relative;
+    }
+
+    .horizontal-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 60% 80% at 20% 50%, rgba(232, 184, 109, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 60% at 80% 30%, rgba(212, 165, 165, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 50% at 60% 80%, rgba(168, 197, 168, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, #1a1815 0%, #2c2520 50%, #1a1815 100%);
+      z-index: -1;
     }
 
     .horizontal-track {
@@ -322,18 +712,51 @@
       justify-content: center;
       padding: clamp(2rem, 8vw, 8rem);
       position: relative;
+      color: var(--color-bg);
+    }
+
+    .horizontal-panel::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+    }
+
+    .horizontal-panel:nth-child(1)::before {
+      background: var(--color-warm-gold);
+      top: 20%;
+      right: 20%;
+    }
+
+    .horizontal-panel:nth-child(2)::before {
+      background: var(--color-soft-rose);
+      bottom: 20%;
+      left: 30%;
+    }
+
+    .horizontal-panel:nth-child(3)::before {
+      background: var(--color-sage);
+      top: 30%;
+      right: 25%;
     }
 
     .horizontal-number {
       font-family: var(--font-display);
       font-size: clamp(4rem, 15vw, 12rem);
       font-weight: 300;
-      opacity: 0.1;
+      opacity: 0.08;
       position: absolute;
       top: 50%;
       right: 8%;
       transform: translateY(-50%);
       line-height: 1;
+      background: linear-gradient(135deg, var(--color-bg), var(--color-warm-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .horizontal-title {
@@ -354,9 +777,27 @@
     /* Pull quote */
     .pullquote-section {
       padding: 10rem clamp(1.5rem, 8vw, 12rem);
-      background: var(--color-bg-alt);
       position: relative;
       overflow: hidden;
+    }
+
+    .pullquote-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 60% at 70% 30%, rgba(232, 184, 109, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 50% at 20% 70%, rgba(196, 101, 58, 0.08) 0%, transparent 50%),
+        linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 50%, var(--color-bg) 100%);
+      z-index: -1;
+    }
+
+    .pullquote-svg {
+      position: absolute;
+      top: 10%;
+      right: 10%;
+      width: 250px;
+      height: 250px;
+      opacity: 0.15;
     }
 
     .pullquote {
@@ -371,14 +812,17 @@
 
     .pullquote::before {
       content: '"';
-      font-size: 8rem;
+      font-size: 10rem;
       position: absolute;
-      top: -3rem;
-      left: -2rem;
-      color: var(--color-accent);
-      opacity: 0.2;
+      top: -4rem;
+      left: -3rem;
       font-family: Georgia, serif;
       line-height: 1;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-warm-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0.3;
     }
 
     .pullquote-author {
@@ -396,13 +840,25 @@
 
     .pullquote-glow {
       position: absolute;
-      width: 400px;
-      height: 400px;
+      width: 500px;
+      height: 500px;
       background: radial-gradient(circle, var(--color-accent), transparent 70%);
-      opacity: 0.06;
+      opacity: 0.08;
       filter: blur(100px);
-      top: 20%;
-      right: 10%;
+      top: 10%;
+      right: 5%;
+      pointer-events: none;
+    }
+
+    .pullquote-glow-2 {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--color-warm-gold), transparent 70%);
+      opacity: 0.1;
+      filter: blur(80px);
+      bottom: 20%;
+      left: 10%;
       pointer-events: none;
     }
 
@@ -415,6 +871,34 @@
       align-items: center;
       text-align: center;
       padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 100% 80% at 50% 80%, rgba(196, 101, 58, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 30% 20%, rgba(232, 184, 109, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 50% at 80% 50%, rgba(168, 197, 168, 0.08) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    .cta-svg-1 {
+      top: 15%;
+      left: 10%;
+      width: 180px;
+      height: 180px;
+      opacity: 0.2;
+    }
+
+    .cta-svg-2 {
+      bottom: 20%;
+      right: 8%;
+      width: 220px;
+      height: 220px;
+      opacity: 0.15;
     }
 
     .cta-pretext {
@@ -431,6 +915,19 @@
       line-height: 1.3;
       max-width: 16ch;
       margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .cta-headline::before {
+      content: '';
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      top: -25%;
+      left: -25%;
+      background: radial-gradient(ellipse, rgba(232, 184, 109, 0.15) 0%, transparent 60%);
+      z-index: -1;
+      filter: blur(60px);
     }
 
     .cta-form {
@@ -446,16 +943,18 @@
       font-size: 1rem;
       padding: 1rem 1.25rem;
       border: 1px solid var(--color-border);
-      border-radius: 8px;
-      background: white;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.8);
       color: var(--color-text);
       transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
     }
 
     .cta-input:focus {
       outline: none;
       border-color: var(--color-accent);
-      box-shadow: 0 0 0 3px var(--color-accent-soft);
+      box-shadow: 0 0 0 4px var(--color-accent-soft), 0 4px 20px rgba(196, 101, 58, 0.15);
+      background: rgba(255, 255, 255, 0.95);
     }
 
     .cta-button {
@@ -463,17 +962,32 @@
       font-size: 1rem;
       font-weight: 500;
       padding: 1rem 2rem;
-      background: var(--color-text);
+      background: linear-gradient(135deg, var(--color-text) 0%, #3d3530 100%);
       color: var(--color-bg);
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(44, 37, 32, 0.25);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(44, 37, 32, 0.3);
+    }
+
+    .cta-button:hover::before {
+      opacity: 1;
     }
 
     .cta-note {
@@ -484,34 +998,63 @@
 
     /* Footer */
     footer {
-      padding: 3rem 2rem;
+      padding: 4rem 2rem;
       text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .footer-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 100%);
       border-top: 1px solid var(--color-border);
+      z-index: -1;
     }
 
     .footer-logo {
       font-family: var(--font-display);
-      font-size: 1.5rem;
+      font-size: 1.75rem;
       font-weight: 400;
       letter-spacing: 0.05em;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--color-text), var(--color-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .footer-links {
       display: flex;
       justify-content: center;
-      gap: 2rem;
+      gap: 2.5rem;
       font-size: 0.85rem;
     }
 
     .footer-links a {
       color: var(--color-text-muted);
       text-decoration: none;
-      transition: color 0.2s ease;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .footer-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--color-accent);
+      transition: width 0.3s ease;
     }
 
     .footer-links a:hover {
       color: var(--color-accent);
+    }
+
+    .footer-links a:hover::after {
+      width: 100%;
     }
 
     /* Clip-path reveal class */
@@ -540,6 +1083,11 @@
         border-right: none;
       }
 
+      .chapter-note.right::before {
+        left: -6px;
+        right: auto;
+      }
+
       .horizontal-wrapper {
         height: auto;
         overflow: visible;
@@ -558,25 +1106,67 @@
       }
 
       .pullquote::before {
-        font-size: 5rem;
-        top: -2rem;
-        left: -0.5rem;
+        font-size: 6rem;
+        top: -2.5rem;
+        left: -1rem;
+      }
+
+      .opening-svg-1,
+      .opening-svg-2,
+      .opening-svg-3 {
+        display: none;
+      }
+
+      .video-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
 
+  <!-- Global gradient mesh -->
+  <div class="gradient-mesh"></div>
+
   <!-- Opening -->
   <section class="opening">
+    <div class="opening-bg"></div>
+    
+    <!-- SVG decorations -->
+    <svg class="svg-decoration opening-svg-1" viewBox="0 0 200 200" fill="none">
+      <circle cx="100" cy="100" r="80" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="100" cy="100" r="60" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+      <circle cx="100" cy="100" r="40" stroke="currentColor" stroke-width="0.5" opacity="0.15"/>
+      <circle cx="100" cy="100" r="20" fill="currentColor" opacity="0.1"/>
+    </svg>
+    
+    <svg class="svg-decoration opening-svg-2" viewBox="0 0 200 200" fill="none">
+      <path d="M20 100 Q100 20 180 100 Q100 180 20 100" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+      <path d="M40 100 Q100 40 160 100 Q100 160 40 100" stroke="currentColor" stroke-width="0.5" opacity="0.15"/>
+      <path d="M60 100 Q100 60 140 100 Q100 140 60 100" stroke="currentColor" stroke-width="0.5" opacity="0.1"/>
+    </svg>
+    
+    <svg class="svg-decoration opening-svg-3" viewBox="0 0 100 100" fill="none">
+      <rect x="20" y="20" width="60" height="60" stroke="currentColor" stroke-width="0.5" opacity="0.2" transform="rotate(15 50 50)"/>
+      <rect x="30" y="30" width="40" height="40" stroke="currentColor" stroke-width="0.5" opacity="0.15" transform="rotate(30 50 50)"/>
+    </svg>
+
     <p class="opening-prompt">An AI journaling experience</p>
     <h1 class="opening-question">What were you thinking about last Tuesday?</h1>
     <div class="opening-scroll">Scroll to remember</div>
   </section>
 
+  <!-- Divider -->
+  <div class="section-divider">
+    <div class="divider-gradient"></div>
+    <div class="divider-line"></div>
+    <div class="divider-dot"></div>
+  </div>
+
   <!-- Manifesto -->
   <section class="manifesto">
     <div class="chapter">
+      <div class="chapter-glow"></div>
       <p class="chapter-text reveal">
         You've written <em>thousands</em> of thoughts. Most of them, forgotten.
       </p>
@@ -584,12 +1174,14 @@
     </div>
 
     <div class="chapter">
+      <div class="chapter-glow"></div>
       <p class="chapter-text right reveal">
         What if your journal could <em>remember</em> for you?
       </p>
     </div>
 
     <div class="chapter">
+      <div class="chapter-glow"></div>
       <p class="chapter-text reveal">
         Not search. Not tags. Something closer to how your mind actually works.
       </p>
@@ -597,6 +1189,7 @@
     </div>
 
     <div class="chapter">
+      <div class="chapter-glow"></div>
       <p class="chapter-text center reveal">
         The idea you had in March. The feeling from last autumn. <em>Connected.</em>
       </p>
@@ -605,6 +1198,7 @@
 
   <!-- Marquee -->
   <section class="marquee-section">
+    <div class="marquee-bg"></div>
     <div class="marquee">
       <div class="marquee-inner">
         <span class="marquee-item">that conversation with your mom last spring <span class="dot"></span></span>
@@ -623,8 +1217,49 @@
     </div>
   </section>
 
+  <!-- Video placeholders section -->
+  <section class="video-section">
+    <div class="video-section-bg"></div>
+    <p class="video-intro reveal">See Drift in action — how memories surface when you need them.</p>
+    
+    <div class="video-grid">
+      <div class="video-placeholder clip-reveal">
+        <div class="video-play-icon"></div>
+        <span class="video-label">Writing Flow</span>
+      </div>
+      <div class="video-placeholder clip-reveal">
+        <div class="video-play-icon"></div>
+        <span class="video-label">AI Connections</span>
+      </div>
+      <div class="video-placeholder clip-reveal">
+        <div class="video-play-icon"></div>
+        <span class="video-label">Memory Search</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="section-divider">
+    <div class="divider-gradient"></div>
+    <div class="divider-line"></div>
+    <div class="divider-dot"></div>
+  </div>
+
   <!-- Journal UI mockup -->
   <section class="journal-section">
+    <div class="journal-section-bg"></div>
+    
+    <svg class="svg-decoration journal-svg-1" viewBox="0 0 200 200" fill="none">
+      <circle cx="100" cy="100" r="90" stroke="currentColor" stroke-width="0.3" stroke-dasharray="4 4" opacity="0.3"/>
+      <circle cx="100" cy="100" r="70" stroke="currentColor" stroke-width="0.3" stroke-dasharray="4 4" opacity="0.2"/>
+      <circle cx="100" cy="100" r="50" stroke="currentColor" stroke-width="0.3" opacity="0.15"/>
+    </svg>
+    
+    <svg class="svg-decoration journal-svg-2" viewBox="0 0 150 150" fill="none">
+      <polygon points="75,10 140,115 10,115" stroke="currentColor" stroke-width="0.3" fill="none" opacity="0.2"/>
+      <polygon points="75,30 120,100 30,100" stroke="currentColor" stroke-width="0.3" fill="none" opacity="0.15"/>
+    </svg>
+    
     <p class="journal-intro reveal">Here's what happens when you write in Drift.</p>
     
     <div class="journal-mockup clip-reveal">
@@ -649,6 +1284,7 @@
 
   <!-- Horizontal scroll feature tour -->
   <section class="horizontal-wrapper">
+    <div class="horizontal-bg"></div>
     <div class="horizontal-track">
       <div class="horizontal-panel">
         <span class="horizontal-number">01</span>
@@ -670,7 +1306,16 @@
 
   <!-- Pull quote -->
   <section class="pullquote-section">
+    <div class="pullquote-bg"></div>
     <div class="pullquote-glow"></div>
+    <div class="pullquote-glow-2"></div>
+    
+    <svg class="svg-decoration pullquote-svg" viewBox="0 0 200 200" fill="none">
+      <ellipse cx="100" cy="100" rx="90" ry="60" stroke="currentColor" stroke-width="0.3" opacity="0.2"/>
+      <ellipse cx="100" cy="100" rx="70" ry="45" stroke="currentColor" stroke-width="0.3" opacity="0.15"/>
+      <ellipse cx="100" cy="100" rx="50" ry="30" stroke="currentColor" stroke-width="0.3" opacity="0.1"/>
+    </svg>
+    
     <blockquote class="pullquote clip-reveal">
       Three weeks in, Drift showed me I'd been circling the same idea in 14 separate entries. I finally started the project.
     </blockquote>
@@ -680,6 +1325,19 @@
 
   <!-- CTA -->
   <section class="cta-section">
+    <div class="cta-bg"></div>
+    
+    <svg class="svg-decoration cta-svg-1" viewBox="0 0 150 150" fill="none">
+      <circle cx="75" cy="75" r="60" stroke="currentColor" stroke-width="0.3" stroke-dasharray="2 6" opacity="0.25"/>
+      <circle cx="75" cy="75" r="40" stroke="currentColor" stroke-width="0.3" opacity="0.15"/>
+      <circle cx="75" cy="75" r="20" fill="currentColor" opacity="0.05"/>
+    </svg>
+    
+    <svg class="svg-decoration cta-svg-2" viewBox="0 0 200 200" fill="none">
+      <path d="M100 20 L180 100 L100 180 L20 100 Z" stroke="currentColor" stroke-width="0.3" opacity="0.15"/>
+      <path d="M100 40 L160 100 L100 160 L40 100 Z" stroke="currentColor" stroke-width="0.3" opacity="0.1"/>
+    </svg>
+    
     <p class="cta-pretext reveal">Early access opens March 2026</p>
     <h2 class="cta-headline reveal">Start remembering what you've already written.</h2>
     <form class="cta-form reveal">
@@ -691,6 +1349,7 @@
 
   <!-- Footer -->
   <footer>
+    <div class="footer-bg"></div>
     <div class="footer-logo">Drift</div>
     <nav class="footer-links">
       <a href="#">About</a>
@@ -749,9 +1408,22 @@
       });
     }
 
-    // Parallax on pullquote glow
+    // Parallax on glows
+    gsap.utils.toArray('.chapter-glow').forEach(glow => {
+      gsap.to(glow, {
+        y: 80,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: glow.parentElement,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+    });
+
     gsap.to('.pullquote-glow', {
-      y: 100,
+      y: 120,
       ease: 'none',
       scrollTrigger: {
         trigger: '.pullquote-section',
@@ -759,6 +1431,32 @@
         end: 'bottom top',
         scrub: true
       }
+    });
+
+    gsap.to('.pullquote-glow-2', {
+      y: -80,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.pullquote-section',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+
+    // SVG floating animation enhancement
+    gsap.utils.toArray('.svg-decoration').forEach((svg, i) => {
+      gsap.to(svg, {
+        y: (i % 2 === 0) ? 30 : -30,
+        rotation: (i % 2 === 0) ? 5 : -5,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: svg.parentElement,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
     });
 
     // Stagger chapter entries
@@ -773,6 +1471,21 @@
         scrollTrigger: {
           trigger: chapter,
           start: 'top 75%'
+        }
+      });
+    });
+
+    // Video placeholders stagger
+    gsap.utils.toArray('.video-placeholder').forEach((vid, i) => {
+      gsap.to(vid, {
+        clipPath: 'inset(0% 0 0% 0)',
+        opacity: 1,
+        duration: 1,
+        delay: i * 0.15,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.video-grid',
+          start: 'top 80%'
         }
       });
     });
