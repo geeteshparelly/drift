@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drift — AI Journaling for Creative Minds</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #faf6f1;
+      --color-bg-alt: #f0e9df;
+      --color-text: #2c2520;
+      --color-text-muted: #6b5f54;
+      --color-accent: #c4653a;
+      --color-accent-soft: rgba(196, 101, 58, 0.12);
+      --color-border: #d9d0c4;
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.7;
+      font-size: clamp(1rem, 2.5vw, 1.125rem);
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Opening */
+    .opening {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .opening-prompt {
+      font-family: var(--font-display);
+      font-size: clamp(0.875rem, 1.5vw, 1rem);
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeDown 1s ease 0.5s forwards;
+    }
+
+    .opening-question {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.2;
+      max-width: 14ch;
+      opacity: 0;
+      animation: fadeUp 1.2s ease 0.8s forwards;
+    }
+
+    .opening-scroll {
+      position: absolute;
+      bottom: 3rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+      opacity: 0;
+      animation: fadeUp 1s ease 1.5s forwards, float 3s ease-in-out 2.5s infinite;
+    }
+
+    .opening-scroll::after {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 40px;
+      background: var(--color-border);
+      margin: 1rem auto 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* Manifesto sections */
+    .manifesto {
+      padding: 0 clamp(1.5rem, 8vw, 12rem);
+    }
+
+    .chapter {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6rem 0;
+    }
+
+    .chapter-text {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2.75rem);
+      font-weight: 300;
+      line-height: 1.5;
+      max-width: 20ch;
+    }
+
+    .chapter-text.right {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .chapter-text.center {
+      margin: 0 auto;
+      text-align: center;
+      max-width: 28ch;
+    }
+
+    .chapter-text em {
+      font-style: italic;
+      color: var(--color-accent);
+    }
+
+    .chapter-note {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-top: 2rem;
+      padding-left: 1.5rem;
+      border-left: 2px solid var(--color-border);
+      max-width: 35ch;
+    }
+
+    .chapter-note.right {
+      margin-left: auto;
+      padding-left: 0;
+      padding-right: 1.5rem;
+      border-left: none;
+      border-right: 2px solid var(--color-border);
+    }
+
+    /* Marquee */
+    .marquee-section {
+      padding: 4rem 0;
+      background: var(--color-bg-alt);
+      margin: 4rem 0;
+    }
+
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      padding: 1.25rem 0;
+    }
+
+    .marquee-inner {
+      display: inline-flex;
+      gap: 4rem;
+      animation: marqueeScroll 35s linear infinite;
+    }
+
+    .marquee-item {
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-style: italic;
+      color: var(--color-text-muted);
+    }
+
+    .marquee-item .dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      margin: 0 2rem;
+      vertical-align: middle;
+    }
+
+    @keyframes marqueeScroll {
+      to { transform: translateX(-50%); }
+    }
+
+    /* Journal UI mockup */
+    .journal-section {
+      padding: 8rem clamp(1.5rem, 8vw, 12rem);
+      position: relative;
+    }
+
+    .journal-intro {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      font-weight: 300;
+      max-width: 45ch;
+      margin-bottom: 4rem;
+      line-height: 1.6;
+    }
+
+    .journal-mockup {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 40px 100px rgba(44, 37, 32, 0.12), 0 0 0 1px var(--color-border);
+      padding: clamp(1.5rem, 4vw, 3rem);
+      max-width: 700px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .journal-mockup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--color-bg-alt), transparent);
+      pointer-events: none;
+    }
+
+    .journal-date {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .journal-entry {
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 300;
+      line-height: 1.9;
+      color: var(--color-text);
+    }
+
+    .journal-entry p {
+      margin-bottom: 1.5rem;
+    }
+
+    .ai-connection {
+      background: var(--color-accent-soft);
+      border-left: 3px solid var(--color-accent);
+      padding: 1rem 1.25rem;
+      margin: 2rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .ai-connection-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .ai-connection-text {
+      font-size: 0.95rem;
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
+    .ai-connection-link {
+      color: var(--color-accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+
+    /* Horizontal scroll feature tour */
+    .horizontal-wrapper {
+      height: 100vh;
+      overflow: hidden;
+      background: var(--color-text);
+      color: var(--color-bg);
+    }
+
+    .horizontal-track {
+      display: flex;
+      height: 100%;
+      width: 300vw;
+    }
+
+    .horizontal-panel {
+      width: 100vw;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(2rem, 8vw, 8rem);
+      position: relative;
+    }
+
+    .horizontal-number {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 15vw, 12rem);
+      font-weight: 300;
+      opacity: 0.1;
+      position: absolute;
+      top: 50%;
+      right: 8%;
+      transform: translateY(-50%);
+      line-height: 1;
+    }
+
+    .horizontal-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+      max-width: 12ch;
+    }
+
+    .horizontal-desc {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      opacity: 0.7;
+      max-width: 35ch;
+      line-height: 1.7;
+    }
+
+    /* Pull quote */
+    .pullquote-section {
+      padding: 10rem clamp(1.5rem, 8vw, 12rem);
+      background: var(--color-bg-alt);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pullquote {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 3rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.4;
+      max-width: 22ch;
+      position: relative;
+    }
+
+    .pullquote::before {
+      content: '"';
+      font-size: 8rem;
+      position: absolute;
+      top: -3rem;
+      left: -2rem;
+      color: var(--color-accent);
+      opacity: 0.2;
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+
+    .pullquote-author {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    .pullquote-context {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+
+    .pullquote-glow {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--color-accent), transparent 70%);
+      opacity: 0.06;
+      filter: blur(100px);
+      top: 20%;
+      right: 10%;
+      pointer-events: none;
+    }
+
+    /* CTA */
+    .cta-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .cta-pretext {
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .cta-headline {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 300;
+      line-height: 1.3;
+      max-width: 16ch;
+      margin-bottom: 3rem;
+    }
+
+    .cta-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .cta-input {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      background: white;
+      color: var(--color-text);
+      transition: all 0.3s ease;
+    }
+
+    .cta-input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-accent-soft);
+    }
+
+    .cta-button {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 1rem 2rem;
+      background: var(--color-text);
+      color: var(--color-bg);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(44, 37, 32, 0.25);
+    }
+
+    .cta-note {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-top: 1.5rem;
+    }
+
+    /* Footer */
+    footer {
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 0.85rem;
+    }
+
+    .footer-links a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--color-accent);
+    }
+
+    /* Clip-path reveal class */
+    .clip-reveal {
+      clip-path: inset(15% 0 15% 0);
+      opacity: 0;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      .chapter {
+        min-height: 60vh;
+        padding: 4rem 0;
+      }
+
+      .chapter-text.right {
+        margin-left: 0;
+        text-align: left;
+      }
+
+      .chapter-note.right {
+        margin-left: 0;
+        padding-left: 1.5rem;
+        padding-right: 0;
+        border-left: 2px solid var(--color-border);
+        border-right: none;
+      }
+
+      .horizontal-wrapper {
+        height: auto;
+        overflow: visible;
+      }
+
+      .horizontal-track {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+      }
+
+      .horizontal-panel {
+        width: 100%;
+        min-height: 70vh;
+        height: auto;
+      }
+
+      .pullquote::before {
+        font-size: 5rem;
+        top: -2rem;
+        left: -0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Opening -->
+  <section class="opening">
+    <p class="opening-prompt">An AI journaling experience</p>
+    <h1 class="opening-question">What were you thinking about last Tuesday?</h1>
+    <div class="opening-scroll">Scroll to remember</div>
+  </section>
+
+  <!-- Manifesto -->
+  <section class="manifesto">
+    <div class="chapter">
+      <p class="chapter-text reveal">
+        You've written <em>thousands</em> of thoughts. Most of them, forgotten.
+      </p>
+      <p class="chapter-note reveal">Buried in notebooks. Lost in apps. Scattered across years.</p>
+    </div>
+
+    <div class="chapter">
+      <p class="chapter-text right reveal">
+        What if your journal could <em>remember</em> for you?
+      </p>
+    </div>
+
+    <div class="chapter">
+      <p class="chapter-text reveal">
+        Not search. Not tags. Something closer to how your mind actually works.
+      </p>
+      <p class="chapter-note reveal">Drift finds the threads you didn't know were there.</p>
+    </div>
+
+    <div class="chapter">
+      <p class="chapter-text center reveal">
+        The idea you had in March. The feeling from last autumn. <em>Connected.</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <section class="marquee-section">
+    <div class="marquee">
+      <div class="marquee-inner">
+        <span class="marquee-item">that conversation with your mom last spring <span class="dot"></span></span>
+        <span class="marquee-item">the dream you almost forgot <span class="dot"></span></span>
+        <span class="marquee-item">why you quit that job <span class="dot"></span></span>
+        <span class="marquee-item">the pattern you didn't notice <span class="dot"></span></span>
+        <span class="marquee-item">what actually makes you happy <span class="dot"></span></span>
+        <span class="marquee-item">that project idea from 2019 <span class="dot"></span></span>
+        <span class="marquee-item">that conversation with your mom last spring <span class="dot"></span></span>
+        <span class="marquee-item">the dream you almost forgot <span class="dot"></span></span>
+        <span class="marquee-item">why you quit that job <span class="dot"></span></span>
+        <span class="marquee-item">the pattern you didn't notice <span class="dot"></span></span>
+        <span class="marquee-item">what actually makes you happy <span class="dot"></span></span>
+        <span class="marquee-item">that project idea from 2019 <span class="dot"></span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journal UI mockup -->
+  <section class="journal-section">
+    <p class="journal-intro reveal">Here's what happens when you write in Drift.</p>
+    
+    <div class="journal-mockup clip-reveal">
+      <div class="journal-date">February 14, 2026 — 11:32 PM</div>
+      <div class="journal-entry">
+        <p>Had coffee with Elena today. We talked about burnout, and how neither of us really saw it coming until it was already there. She said something that stuck with me — "I stopped making things for myself."</p>
+        <p>I think I've been doing the same thing. When's the last time I made something just because I wanted to?</p>
+      </div>
+      
+      <div class="ai-connection">
+        <div class="ai-connection-label">Drift found a connection</div>
+        <div class="ai-connection-text">
+          You wrote something similar on <span class="ai-connection-link">September 8, 2024</span>: "I miss when making things felt like play." That entry was after your trip to Portland. You also mentioned wanting to learn ceramics.
+        </div>
+      </div>
+      
+      <div class="journal-entry">
+        <p>Oh. Right. I did say that.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Horizontal scroll feature tour -->
+  <section class="horizontal-wrapper">
+    <div class="horizontal-track">
+      <div class="horizontal-panel">
+        <span class="horizontal-number">01</span>
+        <h3 class="horizontal-title">Write freely</h3>
+        <p class="horizontal-desc">No prompts. No structure. Just you and the page. Drift stays quiet until you need it.</p>
+      </div>
+      <div class="horizontal-panel">
+        <span class="horizontal-number">02</span>
+        <h3 class="horizontal-title">Drift connects</h3>
+        <p class="horizontal-desc">AI that reads like a thoughtful friend. It surfaces old entries when they matter, not when you search.</p>
+      </div>
+      <div class="horizontal-panel">
+        <span class="horizontal-number">03</span>
+        <h3 class="horizontal-title">You remember</h3>
+        <p class="horizontal-desc">Patterns emerge. Ideas resurface. Your journal becomes a living map of your mind.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pull quote -->
+  <section class="pullquote-section">
+    <div class="pullquote-glow"></div>
+    <blockquote class="pullquote clip-reveal">
+      Three weeks in, Drift showed me I'd been circling the same idea in 14 separate entries. I finally started the project.
+    </blockquote>
+    <p class="pullquote-author reveal">— Mira Chen</p>
+    <p class="pullquote-context reveal">Designer, previously journaled in Apple Notes for 6 years</p>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <p class="cta-pretext reveal">Early access opens March 2026</p>
+    <h2 class="cta-headline reveal">Start remembering what you've already written.</h2>
+    <form class="cta-form reveal">
+      <input type="email" class="cta-input" placeholder="your@email.com" required>
+      <button type="submit" class="cta-button">Join the waitlist</button>
+    </form>
+    <p class="cta-note reveal">Free for early supporters. No spam, just updates.</p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">Drift</div>
+    <nav class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Privacy</a>
+      <a href="#">Twitter</a>
+    </nav>
+  </footer>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Fade + slide reveals
+    gsap.utils.toArray('.reveal').forEach(el => {
+      gsap.from(el, {
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      });
+    });
+
+    // Clip-path reveals
+    gsap.utils.toArray('.clip-reveal').forEach(el => {
+      gsap.to(el, {
+        clipPath: 'inset(0% 0 0% 0)',
+        opacity: 1,
+        duration: 1.2,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 80%',
+          toggleActions: 'play none none none'
+        }
+      });
+    });
+
+    // Horizontal scroll (desktop only)
+    if (window.innerWidth > 768) {
+      gsap.to('.horizontal-track', {
+        xPercent: -66.666,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.horizontal-wrapper',
+          pin: true,
+          scrub: 1,
+          end: '+=2500'
+        }
+      });
+    }
+
+    // Parallax on pullquote glow
+    gsap.to('.pullquote-glow', {
+      y: 100,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.pullquote-section',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+
+    // Stagger chapter entries
+    gsap.utils.toArray('.chapter').forEach((chapter, i) => {
+      const elements = chapter.querySelectorAll('.chapter-text, .chapter-note');
+      gsap.from(elements, {
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.2,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: chapter,
+          start: 'top 75%'
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
